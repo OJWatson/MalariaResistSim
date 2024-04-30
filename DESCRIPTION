@@ -1,0 +1,16 @@
+Package: AMRSpreadModel
+Title: Antimalarial Drug Resistance Spread Model
+Version: 0.0.0.9000
+Authors@R: 
+    person("Chaokun", "Hong", , "chaokunhong@gmail.com", role = c("aut", "cre"))
+Description: This package provides functions to create and run a deterministic model of the spread of antimalarial drug resistance.
+License: GPL-3
+Encoding: UTF-8
+Imports:
+    dplyr,
+    ggplot2,
+    odin,
+    scales,
+    tidyr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
