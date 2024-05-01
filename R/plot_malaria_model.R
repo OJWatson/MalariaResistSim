@@ -30,7 +30,7 @@ plot_malaria_model <- function(results, colors = NULL, line_width = 1, legend_po
   p <- ggplot(results_long, aes(x = time, y = count, color = population)) +
     geom_line(linewidth = line_width) +
     scale_color_manual(values = colors) +
-    labs(x = "Time", y = "Population", title = "Malaria Model Dynamics") +
+    labs(x = "Time", y = "Proportion", title = "Malaria Model Dynamics") +
     theme_minimal()
 
   if (legend_position != "none") {
