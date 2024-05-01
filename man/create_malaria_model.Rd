@@ -19,7 +19,17 @@ create_malaria_model(
   rD,
   rA,
   rTs,
-  rTR
+  rTR,
+  Sv0,
+  Ev_s0,
+  Iv_s0,
+  Ev_r0,
+  Iv_r0,
+  e,
+  mu,
+  n,
+  Lambda_v_s,
+  Lambda_v_r
 )
 }
 \arguments{
@@ -52,6 +62,26 @@ create_malaria_model(
 \item{rTs}{Rate of recovery from treatment to susceptible status}
 
 \item{rTR}{Rate of recovery from treatment to resistant status}
+
+\item{Sv0}{Initial susceptible mosquito population}
+
+\item{Ev_s0}{Initial exposed mosquito population (susceptible strain)}
+
+\item{Iv_s0}{Initial infectious mosquito population (susceptible strain)}
+
+\item{Ev_r0}{Initial exposed mosquito population (resistant strain)}
+
+\item{Iv_r0}{Initial infectious mosquito population (resistant strain)}
+
+\item{e}{Egg laying rate of mosquitoes}
+
+\item{mu}{Mortality rate of mosquitoes}
+
+\item{n}{Delay in days for mosquito development}
+
+\item{Lambda_v_s}{Infection rate for susceptible strain}
+
+\item{Lambda_v_r}{Infection rate for resistant strain}
 }
 \value{
 An object of class \code{odin_model}.
@@ -62,7 +92,9 @@ This function creates a malaria model using user-defined parameters and returns 
 \examples{
 model <- create_malaria_model(S0 = 1000, Ds0 = 100, As0 = 50, Ts0 = 25, DR0 = 10, AR0 = 5, TR0 = 2,
                               Lambda_s = 0.3, Lambda_R = 0.1, Phi = 0.7, fT = 0.2,
-                              rD = 0.05, rA = 0.03, rTs = 0.02, rTR = 0.01)
+                              rD = 0.05, rA = 0.03, rTs = 0.02, rTR = 0.01,
+                              Sv0 = 500, Ev_s0 = 0, Iv_s0 = 0, Ev_r0 = 0, Iv_r0 = 0,
+                              e = 100, mu = 0.1, n = 10, Lambda_v_s = 0.005, Lambda_v_r = 0.003)
 results <- model$run(0:50)
 print(results)
 }
