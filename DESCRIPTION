@@ -14,5 +14,5 @@ Imports:
     tidyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-URL: https://github.com/chaokunh/AMRSpreadModel
-BugReports: https://github.com/chaokunh/AMRSpreadModel/issues
+URL: https://github.com/ChaokunHong/MalariaResistSim
+BugReports: https://github.com/ChaokunHong/MalariaResistSim/issues
