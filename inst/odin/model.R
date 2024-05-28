@@ -1,34 +1,34 @@
 ## Human Equations
-deriv(S) <- -S * Lambda_s * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) -
-  S * Lambda_R * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) +
+deriv(S) <- -S * EIR_s * b_h * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) -
+  S * EIR_R * b_h * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) +
   Ts * rTs + As * rA + AR * rA + TR * rTR
 
-deriv(Ds) <- S * Lambda_s * Phi * (1 - fT) +
-  Lambda_s * As * Phi * (1 - fT) -
+deriv(Ds) <- S * EIR_s * b_h * Phi * (1 - fT) +
+  EIR_s * b_h * As * Phi * (1 - fT) -
   Ds * rD
 
-deriv(As) <- S * Lambda_s * (1 - Phi) +
+deriv(As) <- S * EIR_s * b_h * (1 - Phi) +
   Ds * rD -
-  Lambda_s * As * Phi * (1 - fT) -
-  Lambda_s * As * Phi * fT -
+  EIR_s * b_h * As * Phi * (1 - fT) -
+  EIR_s * b_h * As * Phi * fT -
   As * rA
 
-deriv(Ts) <- S * Lambda_s * Phi * fT +
-  Lambda_s * As * Phi * fT -
+deriv(Ts) <- S * EIR_s * b_h * Phi * fT +
+  EIR_s * b_h * As * Phi * fT -
   Ts * rTs
 
-deriv(DR) <- S * Lambda_R * Phi * (1 - fT) +
-  Lambda_R * AR * Phi * (1 - fT) -
+deriv(DR) <- S * EIR_R * b_h * Phi * (1 - fT) +
+  EIR_R * b_h * AR * Phi * (1 - fT) -
   DR * rD
 
-deriv(AR) <- S * Lambda_R * (1 - Phi) +
+deriv(AR) <- S * EIR_R * b_h * (1 - Phi) +
   DR * rD -
-  Lambda_R * AR * Phi * (1 - fT) -
-  Lambda_R * AR * Phi * fT -
+  EIR_R * b_h * AR * Phi * (1 - fT) -
+  EIR_R * b_h * AR * Phi * fT -
   AR * rA
 
-deriv(TR) <- S * Lambda_R * Phi * fT +
-  Lambda_R * AR * Phi * fT -
+deriv(TR) <- S * EIR_R * b_h * Phi * fT +
+  EIR_R * b_h * AR * Phi * fT -
   TR * rTR
 
 ## Mosquito Equations
@@ -68,8 +68,8 @@ Ts0 <- user()
 DR0 <- user()
 AR0 <- user()
 TR0 <- user()
-Lambda_s <- user()
-Lambda_R <- user()
+EIR_s <- user()
+EIR_R <- user()
 Phi <- user()
 fT <- user()
 rD <- user()
@@ -86,3 +86,4 @@ mu <- user()
 n <- user()
 Lambda_v_s <- user()
 Lambda_v_r <- user()
+b_h <- user()
