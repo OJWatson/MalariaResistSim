@@ -9,6 +9,7 @@
 
 /* .C calls */
 extern void model_initmod_desolve(void *);
+extern void model_output_dde(void *);
 extern void model_rhs_dde(void *);
 extern void model_rhs_desolve(void *);
 
@@ -23,6 +24,7 @@ extern SEXP model_set_user(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"model_initmod_desolve", (DL_FUNC) &model_initmod_desolve, 1},
+    {"model_output_dde",      (DL_FUNC) &model_output_dde,      1},
     {"model_rhs_dde",         (DL_FUNC) &model_rhs_dde,         1},
     {"model_rhs_desolve",     (DL_FUNC) &model_rhs_desolve,     1},
     {NULL, NULL, 0}

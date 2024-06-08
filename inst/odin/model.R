@@ -1,38 +1,40 @@
 ## Human Equations
-deriv(S) <- -S * Lambda_s * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) -
-  if (t >= res_time) (S * Lambda_R * (Phi * fT + Phi * (1 - fT) + (1 - Phi))) else 0 +
-  Ts * rTs + As * rA + if (t >= res_time) (AR * rA + TR * rTR) else 0
+correction_factor <- 1 - (S + Ds + As + Ts + DR + AR + TR)
 
-deriv(Ds) <- S * Lambda_s * Phi * (1 - fT) +
-  Lambda_s * As * Phi * (1 - fT) -
-  Ds * rD
+deriv(S) <- (-S * Lambda_s * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) -
+               S * Lambda_R * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) * res_active +
+               Ts * rTs + As * rA + (AR * rA + TR * rTR) * res_active + correction_factor * S)
 
-deriv(As) <- S * Lambda_s * (1 - Phi) +
-  Ds * rD -
-  Lambda_s * As * Phi * (1 - fT) -
-  Lambda_s * As * Phi * fT -
-  As * rA
+deriv(Ds) <- (S * Lambda_s * Phi * (1 - fT) +
+                Lambda_s * As * Phi * (1 - fT) -
+                Ds * rD + correction_factor * Ds)
 
-deriv(Ts) <- S * Lambda_s * Phi * fT +
-  Lambda_s * As * Phi * fT -
-  Ts * rTs
+deriv(As) <- (S * Lambda_s * (1 - Phi) +
+                Ds * rD -
+                Lambda_s * As * Phi * (1 - fT) -
+                Lambda_s * As * Phi * fT -
+                As * rA + correction_factor * As)
+
+deriv(Ts) <- (S * Lambda_s * Phi * fT +
+                Lambda_s * As * Phi * fT -
+                Ts * rTs + correction_factor * Ts)
 
 deriv(DR) <- if (t >= res_time) (S * Lambda_R * Phi * (1 - fT) +
                                    Lambda_R * AR * Phi * (1 - fT) -
-                                   DR * rD) else - DR * rD
+                                   DR * rD + correction_factor * DR) else 0
 
 deriv(AR) <- if (t >= res_time) (S * Lambda_R * (1 - Phi) +
                                    DR * rD -
                                    Lambda_R * AR * Phi * (1 - fT) -
                                    Lambda_R * AR * Phi * fT -
-                                   AR * rA) else - AR * rA
+                                   AR * rA + correction_factor * AR) else 0
 
 deriv(TR) <- if (t >= res_time) (S * Lambda_R * Phi * fT +
                                    Lambda_R * AR * Phi * fT -
-                                   TR * rTR) else - TR * rTR
+                                   TR * rTR + correction_factor * TR) else 0
 
 ## Mosquito Equations
-deriv(Sv) <- e - (Lambda_v_s + if (t >= res_time) Lambda_v_r else 0) * Sv - mu * Sv
+deriv(Sv) <- e - (Lambda_v_s + Lambda_v_r * res_active) * Sv - mu * Sv
 
 delayed_Lambda_v_s_Sv <- delay(Lambda_v_s * Sv * exp(-mu * n), n)
 
@@ -42,11 +44,13 @@ deriv(Iv_s) <- delayed_Lambda_v_s_Sv - mu * Iv_s
 Lambda_v_r_delayed <- if (t >= res_time) Lambda_v_r else 0
 delayed_Lambda_v_r_Sv <- delay(Lambda_v_r_delayed * Sv * exp(-mu * n), n)
 
-deriv(Ev_r) <- if (t >= res_time) (Lambda_v_r * Sv - delayed_Lambda_v_r_Sv - mu * Ev_r) else - mu * Ev_r
-deriv(Iv_r) <- if (t >= res_time) (delayed_Lambda_v_r_Sv - mu * Iv_r) else - mu * Iv_r
+deriv(Ev_r) <- if (t >= res_time) (Lambda_v_r * Sv - delayed_Lambda_v_r_Sv - mu * Ev_r + correction_factor * Ev_r) else 0
+deriv(Iv_r) <- if (t >= res_time) (delayed_Lambda_v_r_Sv - mu * Iv_r + correction_factor * Iv_r) else 0
 
-output(prevalence) <- S + As + Ds + Ts + if (t >= res_time) (AR + DR + TR) else 0
-output(prevalence_res) <- if (t >= res_time && (AR + DR + TR + As + Ds + Ts) > 0) ((AR + DR + TR) / (As + Ds + Ts + AR + DR + TR)) else 0
+## Outputs
+output(prevalence) <- As + Ds + Ts + if (t >= res_time) (AR + DR + TR) else 0
+output(prevalence_res) <- if (t >= res_time) (AR + DR + TR) else 0
+output(population) <- S + Ds + As + Ts + DR + AR + TR
 
 ## Initial conditions
 initial(S) <- S0
@@ -62,6 +66,9 @@ initial(Iv_s) <- Iv_s0
 initial(Ev_r) <- Ev_r0
 initial(Iv_r) <- Iv_r0
 
+## Time-dependent variable
+res_active <- if (t >= res_time) 1 else 0
+
 ## User-defined parameters
 S0 <- user()
 Ds0 <- user()
@@ -74,7 +81,7 @@ m <- user()
 a <- user()
 b <- user()
 Lambda_s <- m * a * b * Iv_s
-Lambda_R <- if (t >= res_time) (m * a * b * Iv_r) else 0
+Lambda_R <- m * a * b * Iv_r
 Phi <- user()
 fT <- user()
 rD <- user()
@@ -94,8 +101,7 @@ c_A <- user()
 c_D <- user()
 c_T <- user()
 Lambda_v_s <- a * (c_A * As + c_D * Ds + c_T * Ts)
-Lambda_v_r <- if (t >= res_time) (a * (c_A * AR + c_D * DR + c_T * TR)) else 0
+Lambda_v_r <- a * (c_A * AR + c_D * DR + c_T * TR)
 ton <- user()
 toff <- user()
 res_time <- user()
-res_start <- user()
