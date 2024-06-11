@@ -99,7 +99,7 @@ In this example, resistance compartments (DR, AR, TR) will remain zero until res
 The model automatically normalizes the total population to ensure it remains constant throughout the simulation. This is achieved by calculating a correction factor applied to each compartment at every time step.
 
 
-# Run the model for 500 time steps
+### Run the model for 500 time steps
 model_output <- results$model$run(0:500)
 print(model_output)
 
