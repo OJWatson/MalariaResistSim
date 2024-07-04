@@ -1,14 +1,35 @@
 Package: AMRSpreadModel
 Title: Antimalarial Drug Resistance Spread Model
-Version: 0.2.0
+Version: 0.0.3
 Authors@R: 
     person("Chaokun", "Hong", , "chaokunhong@gmail.com", role = c("aut", "cre"))
 Description: This package provides functions to create and run a deterministic model of the spread of antimalarial drug resistance.
 License: GPL-3
 Encoding: UTF-8
+LazyData: true
 Imports:
-    odin
-Roxygen: list(markdown = TRUE)
+    odin,
+    ICDMM,
+    tidyr,
+    stats,
+    ggplot2,
+    data.table,
+    utils,
+    dplyr,
+    Rcpp,
+    magrittr
+Suggests:
+    testthat,
+    knitr,
+    rmarkdown,
+    devtools
+Remotes: 
+    mrc-ide/odin,
+    mrc-ide/dde,
+    mrc-ide/deterministic-malaria-model
+LinkingTo: Rcpp
 RoxygenNote: 7.3.1
+Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr
 URL: https://github.com/ChaokunHong/MalariaResistSim
 BugReports: https://github.com/ChaokunHong/MalariaResistSim/issues

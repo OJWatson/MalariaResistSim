@@ -7,11 +7,12 @@
 form_pars(pars)
 }
 \arguments{
-\item{pars}{Parameter List}
+\item{pars}{A list of parameters to format}
 }
 \value{
-Formatted parameter list
+A formatted list of parameters
 }
 \description{
 Format parameters for the malaria model
 }
+\keyword{internal}

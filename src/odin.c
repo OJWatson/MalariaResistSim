@@ -585,7 +585,7 @@ int user_get_scalar_int(SEXP user, const char *name,
   SEXP el = user_list_element(user, name);
   if (el != R_NilValue) {
     if (length(el) != 1) {
-      Rf_error("Expected scalar integer for '%d'", name);
+      Rf_error("Expected scalar integer for '%s'", name);
     }
     if (TYPEOF(el) == REALSXP) {
       double tmp = REAL(el)[0];

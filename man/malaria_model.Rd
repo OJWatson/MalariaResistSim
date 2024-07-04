@@ -4,42 +4,40 @@
 \alias{malaria_model}
 \title{Create Malaria Model}
 \usage{
-malaria_model(params)
+malaria_model(
+  params = NULL,
+  EIR = NULL,
+  ft = NULL,
+  ton = 5000,
+  toff = 50000,
+  init_res = 0.01,
+  res_time = 3000,
+  rTR_true = 0.1,
+  verbose = FALSE
+)
 }
 \arguments{
-\item{params}{A list of parameters to pass to the model, including:
-\itemize{
-\item S0, Ds0, As0, Ts0, DR0, AR0, TR0: Initial proportions of human population in different compartments
-\item Sv0, Ev_s0, Iv_s0, Ev_r0, Iv_r0: Initial proportions of mosquito population in different compartments
-\item m: Ratio of vectors to humans
-\item a: Biting rate (bites on humans per mosquito per day)
-\item b: Probability of transmission from vectors to humans
-\item Phi: Proportion of symptomatic infections
-\item fT: Proportion of symptomatic infections treated
-\item rD, rA, rTs, rTR_true: Recovery rates for different human compartments
-\item e: Mosquito emergence rate
-\item mu: Mosquito death rate
-\item n: Extrinsic incubation period
-\item c_A, c_D, c_T: Probabilities of transmission from different human compartments to vectors
-\item ton, toff: Time points for changing the recovery rate for treated resistant infections
-\item res_time: Time when resistance starts to appear
-\item res_start: Proportion of resistant infections at res_time
-}}
+\item{params}{A list of parameters to pass to the model. If NULL, parameters will be generated based on EIR and ft.}
+
+\item{EIR}{Entomological Inoculation Rate (used if params is NULL)}
+
+\item{ft}{Treatment rate (used if params is NULL)}
+
+\item{ton}{Time at which treatment is turned on}
+
+\item{toff}{Time at which treatment is turned off}
+
+\item{init_res}{Initial resistance level}
+
+\item{res_time}{Time at which resistance is introduced}
+
+\item{rTR_true}{True treatment rate for resistant parasites}
+
+\item{verbose}{Logical. If TRUE, prints detailed logs. Default is FALSE.}
 }
 \value{
 An object of class \code{odin_model}.
 }
 \description{
-This function creates a malaria model using user-defined parameters and returns an object of class \code{odin_model}.
-}
-\examples{
-params <- list(S0 = 0.9, Ds0 = 0.05, As0 = 0.03, Ts0 = 0.02, DR0 = 0, AR0 = 0,
-               TR0 = 0, Sv0 = 0.9, Ev_s0 = 0.05, Iv_s0 = 0.05, Ev_r0 = 0, Iv_r0 = 0,
-               m = 0.7, a = 0.3, b = 0.1, Phi = 0.7, fT = 0.2, rD = 0.05,
-               rA = 0.03, rTs = 0.02, rTR_true = 0.01, e = 0.1, mu = 0.1,
-               n = 10, c_A = 0.05, c_D = 0.06, c_T = 0.07, ton = 10000,
-               toff = 20000, res_time = 50, res_start = 0.5)
-model <- malaria_model(params)
-results <- model$run(0:500)
-print(results)
+Create Malaria Model
 }
