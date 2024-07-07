@@ -2,7 +2,7 @@
 % Please edit documentation in R/equilibrium.R
 \name{phi_eir_rel}
 \alias{phi_eir_rel}
-\title{Generate equilibrium parameters}
+\title{Generate equilibrium parameters based on EIR and ft}
 \usage{
 phi_eir_rel(
   EIR,
@@ -33,5 +33,5 @@ phi_eir_rel(
 A list of generated parameters.
 }
 \description{
-Generate equilibrium parameters
+Generate equilibrium parameters based on EIR and ft
 }

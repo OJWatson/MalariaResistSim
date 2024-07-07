@@ -1,6 +1,7 @@
 #' @import odin
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib AMRSpreadModel, .registration = TRUE
+#' @importFrom AMRSpreadModel phi_eir_rel
 NULL
 
 #' Create Malaria Model
@@ -25,20 +26,45 @@ malaria_model <- function(params = NULL, EIR = NULL, ft = NULL,
       stop("Model file not found: ", model_file)
     }
 
-    if (is.null(params) && (is.null(EIR) || is.null(ft))) {
-      stop("Either params or both EIR and ft must be provided")
+    if (is.null(params)) {
+      if (is.null(EIR) || is.null(ft)) {
+        stop("Either params or both EIR and ft must be provided")
+      }
+      params <- phi_eir_rel(EIR, ft, ton, toff, init_res, res_time, rTR_true)
     }
 
-    if (is.null(params)) {
-      params <- phi_eir_rel(EIR, ft, ton, toff, init_res, res_time, rTR_true)
-    } else {
-      # If params are provided, update with user-specified values
-      params$ton <- ton
-      params$toff <- toff
-      params$init_res <- init_res
-      params$res_time <- res_time
-      params$rTR_true <- rTR_true
+    # Update parameters
+    params$ton <- ton
+    params$toff <- toff
+    params$init_res <- init_res
+    params$res_time <- res_time
+    params$rTR_true <- rTR_true
+
+    # Generate initial parameters if not already present
+    if (!"S0" %in% names(params)) {
+      params$S0 <- params$S
+      params$Ds0 <- params$D * (1 - init_res)
+      params$DR0 <- params$D * init_res
+      params$As0 <- params$A * (1 - init_res)
+      params$AR0 <- params$A * init_res
+      params$Ts0 <- params$T * (1 - init_res)
+      params$TR0 <- params$T * init_res
+      params$Sv0 <- params$Sv
+      params$Ev_s0 <- params$Ev * (1 - init_res)
+      params$Iv_s0 <- params$Iv * (1 - init_res)
+      params$Ev_r0 <- params$Ev * init_res
+      params$Iv_r0 <- params$Iv * init_res
     }
+
+    # Rename and assign parameters
+    params$Phi <- params$Phi %||% params$phi
+    params$fT <- params$fT %||% params$ft
+    params$rTs <- params$rTs %||% params$rT_S
+    params$rTR <- params$rTR_true
+    params$e <- params$e %||% params$mu
+    params$c_A <- params$c_A %||% params$cA
+    params$c_D <- params$c_D %||% params$cD
+    params$c_T <- params$c_T %||% params$cT
 
     # Ensure all parameters are scalar
     params <- lapply(params, function(x) if(length(x) > 1) x[1] else x)
@@ -46,12 +72,17 @@ malaria_model <- function(params = NULL, EIR = NULL, ft = NULL,
     # Check if all required parameters are present and numeric
     required_params <- c("S0", "Ds0", "As0", "Ts0", "DR0", "AR0", "TR0",
                          "Sv0", "Ev_s0", "Iv_s0", "Ev_r0", "Iv_r0",
-                         "m", "a", "b", "Phi", "fT", "rD", "rA", "rTs", "rTR_true",
+                         "m", "a", "b", "Phi", "fT", "rD", "rA", "rTs", "rTR",
                          "e", "mu", "n", "c_A", "c_D", "c_T",
                          "ton", "toff", "res_time", "init_res")
     missing_params <- setdiff(required_params, names(params))
     if (length(missing_params) > 0) {
       stop("Missing required parameters: ", paste(missing_params, collapse = ", "))
+    }
+
+    # Calculate EIR if not provided
+    if (!"EIR" %in% names(params)) {
+      params$EIR <- params$m * params$a * params$Iv_s0 * 365  # Annual EIR
     }
 
     non_numeric_params <- names(params)[!sapply(params, is.numeric)]
@@ -83,35 +114,5 @@ malaria_model <- function(params = NULL, EIR = NULL, ft = NULL,
   })
 }
 
-#' Format parameters for the malaria model
-#'
-#' @param pars A list of parameters to format
-#' @return A formatted list of parameters
-#' @keywords internal
-form_pars <- function(pars) {
-  default_pars <- list(
-    S0 = 0.9, Ds0 = 0.05, As0 = 0.02, Ts0 = 0.03, DR0 = 0, AR0 = 0, TR0 = 0,
-    Sv0 = 0.9, Ev_s0 = 0.08, Iv_s0 = 0.02, Ev_r0 = 0, Iv_r0 = 0,
-    m = 10, a = 0.3, b = 0.5876259, Phi = 0.7, fT = 0.1, rD = 0.2,
-    rA = 0.01, rTs = 0.2, rTR_true = 0.01, e = 0.132, mu = 0.132,
-    n = 10, c_A = 0.05, c_D = 0.06, c_T = 0.02, ton = 8000,
-    toff = 99999999, res_time = 3000, init_res = 0.2
-  )
-  pars <- modifyList(default_pars, pars)
-  if (pars$res_time == 0) {
-    initial_pars <- list(
-      Ds0 = pars$Ds0 * (1 - pars$init_res),
-      DR0 = pars$Ds0 * pars$init_res,
-      As0 = pars$As0 * (1 - pars$init_res),
-      AR0 = pars$As0 * pars$init_res,
-      Ts0 = pars$Ts0 * (1 - pars$init_res),
-      TR0 = pars$Ts0 * pars$init_res,
-      Ev_s0 = pars$Ev_s0 * (1 - pars$init_res),
-      Iv_s0 = pars$Iv_s0 * (1 - pars$init_res),
-      Ev_r0 = pars$Ev_s0 * pars$init_res,
-      Iv_r0 = pars$Iv_s0 * pars$init_res
-    )
-    pars <- modifyList(pars, initial_pars)
-  }
-  return(pars)
-}
+# Helper function to provide a default value
+`%||%` <- function(x, y) if (is.null(x)) y else x

@@ -22,7 +22,7 @@ plot_model(
 )
 }
 \arguments{
-\item{model_results}{A data frame containing the model results.}
+\item{model_results}{A data frame containing the model results or an odin model object.}
 
 \item{res_time}{The time at which resistance was introduced.}
 
@@ -55,26 +55,4 @@ A ggplot object.
 }
 \description{
 This function plots the results of a malaria model simulation.
-}
-\examples{
-\donttest{
-library(AMRSpreadModel)
-
-params <- list(
-  S0 = 0.9, Ds0 = 0.05, As0 = 0.02, Ts0 = 0.03, DR0 = 0, AR0 = 0,
-  TR0 = 0, Sv0 = 0.9, Ev_s0 = 0.08, Iv_s0 = 0.02, Ev_r0 = 0, Iv_r0 = 0,
-  m = 10, a = 0.3, b = 0.5876259, phi = 0.7, fT = 0.1, rD = 0.2,
-  rA = 0.01, rTs = 0.2, rTR_true = 0.01, e = 0.132, mu = 0.132,
-  n = 10, c_A = 0.05, c_D = 0.06, c_T = 0.02, ton = 8000,
-  toff = 99999999, res_time = 3000, init_res = 0.2
-)
-
-model <- malaria_model(params = params)
-if (!is.null(model)) {
-  results <- model$run(0:500)
-  plot_model(results, res_time = params$res_time, ton = params$ton, toff = params$toff)
-} else {
-  print("Failed to create model. Check parameters and try again.")
-}
-}
 }
