@@ -8,7 +8,7 @@ deriv(S) <- (-S * Lambda_s * (Phi * fT + Phi * (1 - fT) + (1 - Phi)) -
 deriv(Ds) <- (S * Lambda_s * Phi * (1 - fT) +
                 Lambda_s * AR * Phi * (1 - fT) +
                 Lambda_s * As * Phi * (1 - fT) -
-                Ds * rD)
+                Ds * rD) - invading_DR
 
 deriv(As) <- (S * Lambda_s * (1 - Phi) +
                 Lambda_s * AR * (1 - Phi) +
@@ -23,9 +23,9 @@ deriv(As) <- (S * Lambda_s * (1 - Phi) +
 deriv(Ts) <- (S * Lambda_s * Phi * fT +
                 Lambda_s * AR * Phi * fT +
                 Lambda_s * As * Phi * fT -
-                Ts * rTs)
+                Ts * rTs) - invading_TR
 
-deriv(DR) <- (S * Lambda_R * Phi * (1 - fT) +
+deriv(DR) <- invading_DR + (S * Lambda_R * Phi * (1 - fT) +
                 Lambda_R * As * Phi * (1 - fT) +
                 Lambda_R * AR * Phi * (1 - fT) -
                 DR * rD)
@@ -40,7 +40,7 @@ deriv(AR) <- invading_AR + (S * Lambda_R * (1 - Phi) +
                               Lambda_s * AR * (1 - Phi) -
                               AR * rA)
 
-deriv(TR) <- (S * Lambda_R * Phi * fT +
+deriv(TR) <- invading_TR + (S * Lambda_R * Phi * fT +
                 Lambda_R * AR * Phi * fT +
                 Lambda_R * As * Phi * fT -
                 TR * rTR)
@@ -53,12 +53,12 @@ deriv(TR) <- (S * Lambda_R * Phi * fT +
 deriv(Sv) <- e - (Lambda_v_s + Lambda_v_r) * Sv - mu * Sv
 
 delayed_Lambda_v_s_Sv <- delay(Lambda_v_s * Sv * exp(-mu * n), n)
-deriv(Ev_s) <- Lambda_v_s * Sv - delayed_Lambda_v_s_Sv - mu * Ev_s
-deriv(Iv_s) <- delayed_Lambda_v_s_Sv - mu * Iv_s
+deriv(Ev_s) <- Lambda_v_s * Sv - delayed_Lambda_v_s_Sv - mu * Ev_s - invading_Ev_r
+deriv(Iv_s) <- delayed_Lambda_v_s_Sv - mu * Iv_s - invading_Iv_r
 
 delayed_Lambda_v_r_Sv <- delay(Lambda_v_r * Sv * exp(-mu * n), n)
-deriv(Ev_r) <- Lambda_v_r * Sv - delayed_Lambda_v_r_Sv - mu * Ev_r
-deriv(Iv_r) <- delayed_Lambda_v_r_Sv - mu * Iv_r
+deriv(Ev_r) <- invading_Ev_r + (Lambda_v_r * Sv - delayed_Lambda_v_r_Sv - mu * Ev_r)
+deriv(Iv_r) <- invading_Iv_r + (delayed_Lambda_v_r_Sv - mu * Iv_r)
 
 
 
@@ -90,11 +90,12 @@ output(EIR_global) <- EIR_global
 
 
 # Resistance introduction
-invading_AR <- if(t < res_time || t > (res_time+0.05)) 0 else As*init_res
+invading_AR <- if(t < res_time || t > (res_time+1)) 0 else As*log(1/(1-init_res))
+invading_TR <- if(t < res_time || t > (res_time+1)) 0 else Ts*log(1/(1-init_res))
+invading_DR <- if(t < res_time || t > (res_time+1)) 0 else Ds*log(1/(1-init_res))
+invading_Ev_r <- if(t < res_time || t > (res_time+1)) 0 else Ev_s*log(1/(1-init_res))
+invading_Iv_r <- if(t < res_time || t > (res_time+1)) 0 else Iv_s*log(1/(1-init_res))
 output(invading_AR_out) <- invading_AR
-
-
-
 
 
 # Initial conditions
