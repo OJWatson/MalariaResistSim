@@ -11,14 +11,16 @@ NULL
 #' @param ft Treatment rate (used if params is NULL)
 #' @param ton Time at which treatment is turned on
 #' @param toff Time at which treatment is turned off
-#' @param init_res Initial resistance level
+#' @param init_res Initial resistance level at res_time
+#' @param day0_res Resistant at Day 0. Default = 0.01
 #' @param res_time Time at which resistance is introduced
 #' @param rTR_true True treatment rate for resistant parasites
 #' @param verbose Logical. If TRUE, prints detailed logs. Default is FALSE.
 #' @return An object of class `odin_model`.
 #' @export
 malaria_model <- function(params = NULL, EIR = NULL, ft = NULL,
-                          ton = 5000, toff = 50000, init_res = 0.01, res_time = 3000, rTR_true = 0.1,
+                          ton = 5000, toff = 50000, day0_res = 0,
+                          init_res = 0.01, res_time = 3000, rTR_true = 0.1,
                           verbose = FALSE) {
   tryCatch({
     model_file <- system.file("odin", "model.R", package = "AMRSpreadModel")
@@ -43,17 +45,17 @@ malaria_model <- function(params = NULL, EIR = NULL, ft = NULL,
     # Generate initial parameters if not already present
     if (!"S0" %in% names(params)) {
       params$S0 <- params$S
-      params$Ds0 <- params$D * (1 - init_res)
-      params$DR0 <- params$D * init_res
-      params$As0 <- params$A * (1 - init_res)
-      params$AR0 <- params$A * init_res
-      params$Ts0 <- params$T * (1 - init_res)
-      params$TR0 <- params$T * init_res
+      params$Ds0 <- params$D * (1 - day0_res)
+      params$DR0 <- params$D * day0_res
+      params$As0 <- params$A * (1 - day0_res)
+      params$AR0 <- params$A * day0_res
+      params$Ts0 <- params$T * (1 - day0_res)
+      params$TR0 <- params$T * day0_res
       params$Sv0 <- params$Sv
-      params$Ev_s0 <- params$Ev * (1 - init_res)
-      params$Iv_s0 <- params$Iv * (1 - init_res)
-      params$Ev_r0 <- params$Ev * init_res
-      params$Iv_r0 <- params$Iv * init_res
+      params$Ev_s0 <- params$Ev * (1 - day0_res)
+      params$Iv_s0 <- params$Iv * (1 - day0_res)
+      params$Ev_r0 <- params$Ev * day0_res
+      params$Iv_r0 <- params$Iv * day0_res
     }
 
     # Rename and assign parameters
