@@ -14,6 +14,7 @@ range_model(
   time_scale = "day",
   ton = 5000,
   toff = 50000,
+  day0_res = 0,
   init_res = 0.01,
   res_time = 3000,
   rTR_true = 0.1,
@@ -39,7 +40,9 @@ range_model(
 
 \item{toff}{Time at which treatment is turned off}
 
-\item{init_res}{Initial resistance level}
+\item{day0_res}{Resistant at Day 0. Default = 0}
+
+\item{init_res}{Initial resistance level at res_time}
 
 \item{res_time}{Time at which resistance is introduced}
 

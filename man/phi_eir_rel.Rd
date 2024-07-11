@@ -11,7 +11,8 @@ phi_eir_rel(
   toff = 50000,
   init_res = 0.01,
   res_time = 3000,
-  rTR_true = 0.1
+  rTR_true = 0.2,
+  day0_res = 0.01
 )
 }
 \arguments{
@@ -23,11 +24,13 @@ phi_eir_rel(
 
 \item{toff}{Time at which treatment is turned off}
 
-\item{init_res}{Initial resistance level}
+\item{init_res}{Initial resistance level at res_time}
 
 \item{res_time}{Time at which resistance is introduced}
 
 \item{rTR_true}{True treatment rate for resistant parasites}
+
+\item{day0_res}{Resistant at Day 0. Default = 0}
 }
 \value{
 A list of generated parameters.

@@ -72,45 +72,34 @@ equilibrium_init_create <- function(par) {
 #' @param ft Numeric. The treatment rate.
 #' @param ton Time at which treatment is turned on
 #' @param toff Time at which treatment is turned off
-#' @param init_res Initial resistance level
+#' @param day0_res Resistant at Day 0. Default = 0
+#' @param init_res Initial resistance level at res_time
 #' @param res_time Time at which resistance is introduced
 #' @param rTR_true True treatment rate for resistant parasites
 #' @return A list of generated parameters.
 #' @export
-phi_eir_rel <- function(EIR, ft, ton = 5000, toff = 50000, init_res = 0.01, res_time = 3000, rTR_true = 0.1) {
+phi_eir_rel <- function(EIR, ft, ton = 5000, toff = 50000, init_res = 0.01, res_time = 3000, rTR_true = 0.2, day0_res = 0.01) {
   mpl <- ICDMM::model_param_list_create(rho=0, rA = 1/(250), rU = Inf, rP = Inf, sigma2 = 0)
   eq <- ICDMM::equilibrium_init_create(
     age_vector=c(0,0.25,0.5,0.75,1,1.25,1.5,1.75,2,3.5,5,7.5,10,15,20,30,40,50,60,70,80),
     EIR=EIR, ft=ft,
-    model_param_list = mpl, het_brackets=1,
+    model_param_list = mpl, het_brackets=2,
     country = NULL,
     admin_unit = NULL)
 
   # Safe function to calculate weighted mean
-  safe_weighted_mean <- function(x, w) {
-    if (is.null(x) || length(x) == 0) {
-      return(NA)
-    }
-    if (is.null(dim(x))) {
-      if (length(x) != length(w)) {
-        return(mean(x, na.rm = TRUE))
-      }
-      return(weighted.mean(x, w, na.rm = TRUE))
-    }
-    if (nrow(x) != length(w)) {
-      return(mean(x, na.rm = TRUE))
-    }
-    return(weighted.mean(rowMeans(x, na.rm = TRUE), w, na.rm = TRUE))
-  }
+  phi <- weighted.mean(
+    apply(eq$phi_eq, 1, weighted.mean, eq$het_wt),
+    eq$den
+  )
 
-  phi <- safe_weighted_mean(eq$phi_eq, eq$het_wt)
-  if (is.na(phi)) phi <- mean(eq$phi0, na.rm = TRUE)
+  c_A <- weighted.mean(
+    apply(eq$cA_eq, 1, weighted.mean, eq$het_wt),
+    rowMeans(eq$init_A)
+  )
 
-  c_A <- safe_weighted_mean(eq$cA_eq, eq$het_wt)
-  if (is.na(c_A)) c_A <- mean(eq$cA, na.rm = TRUE)
 
-  b <- safe_weighted_mean(eq$b0 * ((1 - eq$b1)/(1 + (eq$init_IB/eq$IB0)^eq$kB) + eq$b1), eq$den)
-  if (is.na(b)) b <- mean(eq$b0, na.rm = TRUE)
+  b <- weighted.mean(rowMeans(eq$b0 * ((1 - eq$b1)/(1 + (eq$init_IB/eq$IB0)^eq$kB) + eq$b1)), eq$den)
 
   S <- sum(eq$init_S) + sum(eq$init_P)
   D <- sum(eq$init_D)
@@ -135,6 +124,7 @@ phi_eir_rel <- function(EIR, ft, ton = 5000, toff = 50000, init_res = 0.01, res_
     ton = ton,
     toff = toff,
     res_time = res_time,
+    day0_res = day0_res,
     init_res = init_res,
     rTR_true = rTR_true
   )

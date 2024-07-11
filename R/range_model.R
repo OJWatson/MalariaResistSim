@@ -25,7 +25,8 @@ summarize_model_results <- function(results, time_points) {
 #' @param time_scale Character. Either "day" or "year". Default is "day". This affects both input and output time units.
 #' @param ton Time at which treatment is turned on
 #' @param toff Time at which treatment is turned off
-#' @param init_res Initial resistance level
+#' @param day0_res Resistant at Day 0. Default = 0
+#' @param init_res Initial resistance level at res_time
 #' @param res_time Time at which resistance is introduced
 #' @param rTR_true True treatment rate for resistant parasites
 #' @param verbose Logical. If TRUE, prints detailed logs. Default is FALSE.
@@ -33,7 +34,7 @@ summarize_model_results <- function(results, time_points) {
 #' @export
 range_model <- function(param_ranges, params = NULL, output_vars = NULL, use_eir_ft = FALSE,
                         run_time = 5000, time_points = NULL, time_scale = "day",
-                        ton = 5000, toff = 50000, init_res = 0.01, res_time = 3000, rTR_true = 0.1,
+                        ton = 5000, toff = 50000, day0_res = 0, init_res = 0.01, res_time = 3000, rTR_true = 0.1,
                         verbose = FALSE) {
   if (verbose) {
     cat("Generating parameter grid...\n")
@@ -84,7 +85,7 @@ range_model <- function(param_ranges, params = NULL, output_vars = NULL, use_eir
         if (verbose) {
           cat(paste("Generating parameters for EIR =", row[["EIR"]], "and ft =", row[["ft"]]), "\n")
         }
-        current_params <- phi_eir_rel(row[["EIR"]], row[["ft"]], ton, toff, init_res, res_time, row[["rTR_true"]])
+        current_params <- phi_eir_rel(row[["EIR"]], row[["ft"]], ton, toff, day0_res, init_res, res_time, row[["rTR_true"]])
         if (is.null(current_params)) {
           stop("phi_eir_rel returned NULL")
         }
@@ -99,7 +100,8 @@ range_model <- function(param_ranges, params = NULL, output_vars = NULL, use_eir
       if (verbose) {
         cat("Creating malaria model...\n")
       }
-      model <- malaria_model(params = current_params, ton = ton, toff = toff, init_res = init_res, res_time = res_time, rTR_true = current_params$rTR_true, verbose = verbose)
+      model <- malaria_model(params = current_params, ton = ton, toff = toff, day0_res = day0_res,
+                             init_res = init_res, res_time = res_time, rTR_true = current_params$rTR_true, verbose = verbose)
       if (is.null(model)) {
         stop("malaria_model returned NULL")
       }
