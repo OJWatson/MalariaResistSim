@@ -78,8 +78,8 @@ uga_ranges <- chaokun_dat %>%
 uga_eir_ranges <- uga_ranges %>%
   split(.$name_1) %>%
   map(.f = function(x){
-    x$eir_high <- pfpr_to_eir_heuristic(x$ft_low, x$pfpr_high)
-    x$eir_low <- pfpr_to_eir_heuristic(x$ft_high, x$pfpr_low)
+    x$eir_high <- pfpr_to_eir_heuristic(x$ft_high, x$pfpr_high)
+    x$eir_low <- pfpr_to_eir_heuristic(x$ft_low, x$pfpr_low)
     return(x)
   }) %>%
   do.call(rbind, .) %>%
